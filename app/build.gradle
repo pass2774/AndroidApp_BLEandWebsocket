@@ -1,0 +1,103 @@
+plugins {
+    id 'com.android.application'
+    id 'kotlin-android'
+    id 'kotlin-kapt'
+    id 'koin'
+}
+
+android {
+    compileSdkVersion 30
+    buildToolsVersion "30.0.3"
+
+    defaultConfig {
+        applicationId "com.example.androidapp_bleandwebsocket"
+        minSdkVersion 23
+        targetSdkVersion 30
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    buildFeatures{
+        dataBinding = true
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+}
+
+dependencies {
+    def archLifecycleVersion = '2.2.0'
+    def materialVersion = '1.2.1'
+
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    implementation 'androidx.core:core-ktx:1.5.0'
+    implementation 'androidx.appcompat:appcompat:1.3.0'
+    implementation 'com.google.android.material:material:1.3.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
+
+    //Original setting from lillyble example :https://ddangeun.tistory.com/98
+//    implementation fileTree(dir: "libs", include: ["*.jar"])
+//    implementation 'androidx.core:core-ktx:1.3.2'
+//    implementation 'androidx.appcompat:appcompat:1.2.0'
+//    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
+
+
+    testImplementation 'junit:junit:4.+'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.2'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
+
+
+    // lifecycle
+    implementation "androidx.lifecycle:lifecycle-extensions:2.2.0"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0"
+    implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.2.0"
+
+    // data binding
+    //kapt "com.android.databinding:compiler:4.0.1"
+
+    // Material design
+    implementation "com.google.android.material:material:$materialVersion"
+
+    // Koin
+    implementation "org.koin:koin-android:$koin_version"
+    implementation "org.koin:koin-androidx-scope:$koin_version"
+    implementation "org.koin:koin-androidx-viewmodel:$koin_version"
+
+
+    // for new API replaced startActivityForResult
+    implementation 'androidx.fragment:fragment-ktx:1.3.0-rc02'
+
+
+
+    //Added by Joonhwa Choi
+    // WebSocket
+    implementation "org.java-websocket:Java-WebSocket:1.5.1"
+    // Moshi
+//    implementation 'com.squareup.moshi:moshi:1.9.2'
+//    kapt 'com.squareup.moshi:moshi-kotlin-codegen:1.9.2'
+    implementation 'com.squareup.moshi:moshi:1.12.0'
+    kapt 'com.squareup.moshi:moshi-kotlin-codegen:1.12.0'
+
+    implementation ('io.socket:socket.io-client:2.0.0') {
+        exclude group: 'org.json', module: 'json'
+    }
+
+    //Added by Joonhwa Choi2
+    implementation 'com.google.code.gson:gson:2.8.5'
+    //Socket.io
+//    implementation('io.socket:socket.io-client:1.0.0') {//2.0.0??
+//        exclude group: 'org.json', module: 'json'
+//    }
+}
