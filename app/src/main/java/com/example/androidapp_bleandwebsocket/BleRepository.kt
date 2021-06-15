@@ -62,7 +62,6 @@ class BleRepository {
                 emit(txtRead)
 //                webSocketClient.send(
 //                    //data frame
-//                    //my pick: dev1, time, sensor1/datainfo(ex: uint16_t:sampling rate=50Hz)/data(0:1:2:3:...:N),sensor2/datatype(ex: double)/data(0:1:2:3:...:M),
 //                    "monitor_MFC1,4,3,2,1,0"
 //                )
                 isTxtRead = false
