@@ -23,4 +23,5 @@ Main reference:
   - https://seunghyun.in/android/6/
 
 *Bug report: the chart shuts down after 4~5 restarting using 'startbutton'
+
 *Next goal: Studying 'fragment', implementing a fragment of the graph on the MainActivity
