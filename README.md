@@ -22,5 +22,5 @@ Main reference:
   - https://deque.tistory.com/112?category=984011
   - https://seunghyun.in/android/6/
 
-
-*NEXT Goal: Studying 'fragment', implementing a fragment of the graph on the MainActivity
+*Bug report: the chart shuts down after 4~5 restarting using 'startbutton'
+*Next goal: Studying 'fragment', implementing a fragment of the graph on the MainActivity
