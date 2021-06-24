@@ -29,6 +29,7 @@ import com.example.androidapp_bleandwebsocket.adapter.BleListAdapter
 import com.example.androidapp_bleandwebsocket.databinding.ActivityMainBinding
 import com.example.androidapp_bleandwebsocket.viewmodel.MainViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import com.example.androidapp_bleandwebsocket.util.Event
 
 
 ////For Websocket
@@ -51,6 +52,7 @@ class MainActivity : AppCompatActivity() {
     @RequiresApi(Build.VERSION_CODES.M)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         val binding = DataBindingUtil.setContentView<ActivityMainBinding>(
             this,
             R.layout.activity_main
@@ -84,6 +86,8 @@ class MainActivity : AppCompatActivity() {
 
 
     }
+
+
     private fun initObserver(binding: ActivityMainBinding){
         viewModel.requestEnableBLE.observe(this, {
             it.getContentIfNotHandled()?.let {
@@ -125,6 +129,21 @@ class MainActivity : AppCompatActivity() {
             }
 
         })
+
+        //Opening new activity
+        viewModel.openEvent.observe(this,{
+            it.getContentIfNotHandled()?.let{ connect->
+                var intent = Intent(this, ChartActivity::class.java)
+//            intent.putExtra("sample", sampleText)
+                startActivity(intent)
+            }
+//            Toast.makeText(this, "SiiiiiiBAL", Toast.LENGTH_SHORT).show()
+        })
+
+//        viewModel.openEvent.eventObserve(this,{ sampleText ->
+//            var intent = Intent(this, ChartActivity::class.java)
+//            startActivity(intent)
+//        })
     }
     override fun onResume() {
         super.onResume()
@@ -191,4 +210,9 @@ class MainActivity : AppCompatActivity() {
     }
 
 
+    //Joonhwa Choi Tried:
+//    fun Transfer2ChatActivity(){
+//        var intent = Intent(this, ChartActivity::class.java)
+//        startActivity(intent)
+//    }
 }

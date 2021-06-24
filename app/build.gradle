@@ -28,6 +28,9 @@ android {
     buildFeatures{
         dataBinding = true
     }
+    viewBinding {
+        enabled = true
+    }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
@@ -36,7 +39,9 @@ android {
         jvmTarget = '1.8'
     }
 }
-
+repositories{
+    maven { url 'https://jitpack.io' } //for MPAndroidChart
+}
 dependencies {
     def archLifecycleVersion = '2.2.0'
     def materialVersion = '1.2.1'
@@ -100,4 +105,8 @@ dependencies {
 //    implementation('io.socket:socket.io-client:1.0.0') {//2.0.0??
 //        exclude group: 'org.json', module: 'json'
 //    }
+
+    //For MPAndroidChart
+    implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
+
 }

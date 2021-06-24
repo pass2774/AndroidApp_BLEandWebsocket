@@ -10,6 +10,10 @@ import com.example.androidapp_bleandwebsocket.*
 import com.example.androidapp_bleandwebsocket.util.Event
 import java.util.*
 
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Observer
+import androidx.annotation.MainThread
 
 class MainViewModel(private val bleRepository: BleRepository) : ViewModel() {
     val statusTxt: LiveData<String>
@@ -17,7 +21,9 @@ class MainViewModel(private val bleRepository: BleRepository) : ViewModel() {
     val readTxt: LiveData<String>
         get() = bleRepository.fetchReadText().asLiveData(viewModelScope.coroutineContext)
 
-
+    //Joonhwa - new activty
+    private val _openEvent = MutableLiveData<Event<String>>()
+    val openEvent: LiveData<Event<String>> get() = _openEvent
 
 
     //ble adapter
@@ -63,8 +69,26 @@ class MainViewModel(private val bleRepository: BleRepository) : ViewModel() {
 //        cmdBytes[1] = 2
 
         bleRepository.writeData(cmdBytes)
-
     }
 
+    fun onClickGotoGraph(){
+//        var intent = Intent(this, ChartActivity::class.java)
+//        startActivity(intent)
+        val text: String = "sibal"
+        _openEvent.value = Event(text)
+    }
+}
 
+
+inline fun <T> LiveData<Event<T>>.eventObserve(
+    owner: LifecycleOwner,
+    crossinline onChanged: (T) -> Unit
+): Observer<Event<T>> {
+    val wrappedObserver = Observer<Event<T>> { t ->
+        t.getContentIfNotHandled()?.let {
+            onChanged.invoke(it)
+        }
+    }
+    observe(owner, wrappedObserver)
+    return wrappedObserver
 }
