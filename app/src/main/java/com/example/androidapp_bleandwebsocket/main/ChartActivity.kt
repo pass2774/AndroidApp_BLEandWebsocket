@@ -15,7 +15,6 @@ import android.graphics.Color
 import android.graphics.DashPathEffect
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.components.Legend
-
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
@@ -23,6 +22,8 @@ import com.github.mikephil.charting.data.LineDataSet
 class ChartActivity : AppCompatActivity() {
     var isrunning = false
     private lateinit var binding: ActivityChartBinding
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
