@@ -24,6 +24,7 @@
             android:text="Press the Scan button to start Ble Scan."
             android:textColor="@color/lilly_color4" />
 
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -78,7 +79,7 @@
         <ScrollView
 
             android:layout_width="match_parent"
-            android:layout_height="300dp">
+            android:layout_height="200dp">
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rv_ble_list"
@@ -96,7 +97,7 @@
         <ScrollView
             android:id="@+id/scroller"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="150dp"
             android:layout_marginTop="10dp"
             android:background="@color/lilly_color4">
 
@@ -108,7 +109,12 @@
                 android:lineSpacingExtra="7dp"
                 android:textColor="@color/white" />
         </ScrollView>
-
+        <fragment
+            android:id="@+id/fragment_test"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:name="com.example.androidapp_bleandwebsocket.FragmentChart">
+        </fragment>
 
     </LinearLayout>
 </layout>

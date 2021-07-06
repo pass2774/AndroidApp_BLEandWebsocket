@@ -286,7 +286,7 @@ class BleRepository {
 
             webSocketClient.send(
                 //data frame
-                //my pick: dev1, time, sensor1/datainfo(ex: uint16_t:sampling rate=50Hz)/data(0:1:2:3:...:N),sensor2/datatype(ex: double)/data(0:1:2:3:...:M),
+                //my pick: id, message_type,time, sensor1/datainfo(ex: uint16_t:sampling rate=50Hz)/data(0:1:2:3:...:N),sensor2/datatype(ex: double)/data(0:1:2:3:...:M),
 //                "android_test,0,${shorts[0]},${shorts[1]},1,0"
                 "android_test,(message_type),${dateAndtime},ECG/uint16_t/20/${shorts[0]}:${shorts[1]}:${shorts[2]}:${shorts[3]}:${shorts[4]},Temperature/int16_t/1000/${shorts[0]},BldPrs/uint16_t/1000/${shorts[0]}"
 //                "android_test,(message_type),${dateAndtime.format(TimeStampFormatter)},ECG/uint16_t/20ms/${shorts[0]}:${shorts[1]}:${shorts[2]}:${shorts[3]}:${shorts[4]},Temperature/int16_t/1000ms/${shorts[0]},BldPrs/uint16_t/1000ms/${shorts[0]}"
