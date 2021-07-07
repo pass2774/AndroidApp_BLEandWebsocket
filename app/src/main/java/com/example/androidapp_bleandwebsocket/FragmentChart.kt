@@ -1,5 +1,6 @@
 package com.example.androidapp_bleandwebsocket
 
+import android.content.Context
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -19,7 +20,7 @@ import com.example.androidapp_bleandwebsocket.databinding.FragmentChartBinding
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil.setContentView
 import android.widget.Button
-
+import com.example.androidapp_bleandwebsocket.main.MainActivity
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -36,14 +37,17 @@ class FragmentChart : Fragment() {
     private var param1: String? = null
     private var param2: String? = null
 
+    lateinit var mContext: Context
+
+    override fun onAttach(context: Context){
+        super.onAttach(context)
+        mContext = context
+    }
+
     var isrunning = false
-//    private lateinit var binding: FragmentChartBinding
-
     private var _binding: FragmentChartBinding? = null
-    // This property is only valid between onCreateView and
-    // onDestroyView.
+    // This property is only valid between onCreateView and onDestroyView.
     private val binding get() = _binding!!
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,31 +55,6 @@ class FragmentChart : Fragment() {
             param1 = it.getString(ARG_PARAM1)
             param2 = it.getString(ARG_PARAM2)
         }
-        //Start - Joonhwa
-
-//        binding = FragmentChartBinding.inflate(layoutInflater)
-//        val view = binding.root
-//        setContentView(view)
-//
-//        binding.startButton.text = "Graph"
-////        setContentView(R.layout.chart)
-////
-//        binding.startButton.setOnClickListener {
-//            if (isrunning == false) {
-//                isrunning = true
-//                binding.startButton.text = "그래프 구현중"
-//                binding.startButton.isClickable = false
-//                val thread = ThreadClass()
-//                thread.start()
-//            }
-//        }
-//
-//
-
-        //End - Joonhwa
-
-
-
     }
 
     override fun onCreateView(
@@ -97,17 +76,6 @@ class FragmentChart : Fragment() {
                 thread.start()
             }
         }
-
-//        val view: View = inflater!!.inflate(R.layout.fragment_chart, container, false)
-//        val btn: Button = view.findViewById(R.id.startButton)
-//        btn.setOnClickListener(this)
-//        btn.text = "Graph"
-//        view.ststartButton.setOnClickListener { view ->
-//            Log.d("btnSetup", "Selected")
-//        }
-
-
-
         return view
     }
 
@@ -150,10 +118,10 @@ class FragmentChart : Fragment() {
             // chart.xml에 배치된 lineChart에 데이터 연결
             binding.lineChart.data = data
 
-//            runOnUiThread {
-//                // 그래프 생성
-//                binding.lineChart.animateXY(1, 1)
-//            }
+            (mContext as MainActivity).runOnUiThread {
+                // 그래프 생성
+                binding.lineChart.animateXY(1, 1)
+            }
 
             for (i in 0 until input.size){
                 SystemClock.sleep(10)
