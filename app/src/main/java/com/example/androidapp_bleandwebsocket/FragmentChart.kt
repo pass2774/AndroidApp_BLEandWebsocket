@@ -21,6 +21,8 @@ import android.widget.Toast
 import androidx.databinding.DataBindingUtil.setContentView
 import android.widget.Button
 import com.example.androidapp_bleandwebsocket.main.MainActivity
+import java.util.*
+import kotlin.math.sin
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -39,6 +41,15 @@ class FragmentChart : Fragment() {
 
     lateinit var mContext: Context
 
+
+    // For Chart
+    var Chart_linedataset: LineDataSet? = null
+    // 그래프 data 생성 -> 최종 입력 데이터
+    var Chart_data: LineData? = null
+
+
+    var chart_y_dummy: Float = 0.0f
+
     override fun onAttach(context: Context){
         super.onAttach(context)
         mContext = context
@@ -48,6 +59,10 @@ class FragmentChart : Fragment() {
     private var _binding: FragmentChartBinding? = null
     // This property is only valid between onCreateView and onDestroyView.
     private val binding get() = _binding!!
+
+    private fun InitChartSetting(){
+
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -67,13 +82,20 @@ class FragmentChart : Fragment() {
         val view = binding.root
         binding.startButton.text = "Graph YEE!"
 
+        Chart_linedataset = createLineDataSet()
+        Chart_data = LineData(Chart_linedataset)
+        // (~chart~).xml에 배치된 lineChart에 데이터 연결
+        binding.lineChart.data = Chart_data
+
         binding.startButton.setOnClickListener {
             if (isrunning == false) {
                 isrunning = true
                 binding.startButton.text = "그래프 구현중"
                 binding.startButton.isClickable = false
                 val thread = ThreadClass()
-                thread.start()
+//                for(i in 0..1) {
+                    thread.start()
+//                }
             }
         }
         return view
@@ -103,20 +125,27 @@ class FragmentChart : Fragment() {
                 }
             }
     }
+    private fun createLineDataSet() :LineDataSet{
+        //            var entries: ArrayList<Entry> = ArrayList()
+//            // Entry 배열 초기값 입력
+//            entries.add(Entry(0F , 0F))
+//            // 그래프 구현을 위한 LineDataSet 생성
+//            var dataset: LineDataSet = LineDataSet(entries, "input")
+        var linedataset: LineDataSet = LineDataSet(null, "fake signal")
+        linedataset.setLineWidth(1f);
+        linedataset.setDrawValues(false);
+        linedataset.setValueTextColor(Color.WHITE);
+        linedataset.setColor(Color.WHITE);
+        linedataset.setMode(LineDataSet.Mode.LINEAR);
+        linedataset.setDrawCircles(false);
+        linedataset.setHighLightColor(Color.rgb(190, 190, 190));
+        return linedataset
+    }
 
     inner class ThreadClass : Thread() {
         override fun run() {
-            val input = Array<Double>(100,{Math.random()})
-            // Entry 배열 생성
-            var entries: ArrayList<Entry> = ArrayList()
-            // Entry 배열 초기값 입력
-            entries.add(Entry(0F , 0F))
-            // 그래프 구현을 위한 LineDataSet 생성
-            var dataset: LineDataSet = LineDataSet(entries, "input")
-            // 그래프 data 생성 -> 최종 입력 데이터
-            var data: LineData = LineData(dataset)
-            // chart.xml에 배치된 lineChart에 데이터 연결
-            binding.lineChart.data = data
+            val input = Array<Double>(200,{Math.random()})
+            val input_activity = Array<Double>(100,{Math.random()})
 
             (mContext as MainActivity).runOnUiThread {
                 // 그래프 생성
@@ -124,12 +153,14 @@ class FragmentChart : Fragment() {
             }
 
             for (i in 0 until input.size){
-                SystemClock.sleep(10)
-                data.addEntry(Entry(i.toFloat(), input[i].toFloat()), 0)
-                data.notifyDataChanged()
+//                SystemClock.sleep(5)
+                SystemClock.sleep(30)
+                Chart_data?.addEntry(Entry(i.toFloat(), sin(i.toFloat()/3.0f)+1.0f+chart_y_dummy), 0)
+                Chart_data?.notifyDataChanged()
                 binding.lineChart.notifyDataSetChanged()
                 binding.lineChart.invalidate()
             }
+            chart_y_dummy=chart_y_dummy+1.0f
             binding.startButton.text = "난수 생성 시작"
             binding.startButton.isClickable = true
             isrunning = false

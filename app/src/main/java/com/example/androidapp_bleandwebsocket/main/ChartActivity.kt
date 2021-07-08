@@ -55,6 +55,8 @@ class ChartActivity : AppCompatActivity() {
             entries.add(Entry(0F , 0F))
             // 그래프 구현을 위한 LineDataSet 생성
             var dataset: LineDataSet = LineDataSet(entries, "input")
+
+
             // 그래프 data 생성 -> 최종 입력 데이터
             var data: LineData = LineData(dataset)
             // chart.xml에 배치된 lineChart에 데이터 연결
