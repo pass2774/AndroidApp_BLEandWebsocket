@@ -100,7 +100,6 @@
             android:layout_height="150dp"
             android:layout_marginTop="10dp"
             android:background="@color/lilly_color4">
-
             <TextView
                 android:id="@+id/txt_read"
                 android:layout_width="wrap_content"
@@ -109,12 +108,17 @@
                 android:lineSpacingExtra="7dp"
                 android:textColor="@color/white" />
         </ScrollView>
-        <fragment
-            android:id="@+id/fragment_test"
+<!--        <fragment-->
+<!--            android:id="@+id/fragment_test"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="match_parent"-->
+<!--            android:name="com.example.androidapp_bleandwebsocket.FragmentChart">-->
+<!--        </fragment>-->
+        <FrameLayout
+            android:id="@+id/frameLayout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:name="com.example.androidapp_bleandwebsocket.FragmentChart">
-        </fragment>
-
+            android:layout_margin="1dp"
+        />
     </LinearLayout>
 </layout>

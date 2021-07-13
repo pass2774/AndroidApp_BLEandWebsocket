@@ -53,6 +53,7 @@ class BleRepository {
 
     var statusTxt: String = ""
     var txtRead: String = ""
+    lateinit var sensorRead: Collection<UShort>
 
     var isStatusChange: Boolean = false
     var isTxtRead: Boolean = false
@@ -60,16 +61,22 @@ class BleRepository {
         while(true) {
             if(isTxtRead) {
                 emit(txtRead)
-//                webSocketClient.send(
-//                    //data frame
-//                    "monitor_MFC1,4,3,2,1,0"
-//                )
+//                emit(sensorRead.contentToString())
                 isTxtRead = false
-
-
             }
         }
     }.flowOn(Dispatchers.Default)
+    fun fetchReadSensor() = flow{
+        while(true) {
+            if(isTxtRead) {
+//                emit(txtRead)
+                emit(sensorRead)
+                isTxtRead = false
+            }
+        }
+    }.flowOn(Dispatchers.Default)
+
+
     fun fetchStatusText() = flow{
         while(true) {
             if(isStatusChange) {
@@ -279,6 +286,7 @@ class BleRepository {
 //            txtRead =msg.contentToString()
 
             val shorts = msg.asList().chunked(2).map{ (l, h) -> (l.toUInt() + h.toUInt().shl(8)).toUShort() }.toUShortArray()
+            sensorRead=shorts
             txtRead=shorts.contentToString()
             val dateAndtime: LocalDateTime = LocalDateTime.now()
 //            val TimeStampFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss.SSS")

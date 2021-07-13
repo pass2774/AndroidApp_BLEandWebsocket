@@ -30,6 +30,7 @@ import com.example.androidapp_bleandwebsocket.databinding.ActivityMainBinding
 import com.example.androidapp_bleandwebsocket.viewmodel.MainViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import com.example.androidapp_bleandwebsocket.util.Event
+import com.example.androidapp_bleandwebsocket.FragmentChart
 
 
 ////For Websocket
@@ -46,6 +47,7 @@ class MainActivity : AppCompatActivity() {
 
     private val viewModel by viewModel<MainViewModel>()
     private var adapter: BleListAdapter? = null
+    val fragmentChart = FragmentChart()
 
 
 
@@ -78,12 +80,15 @@ class MainActivity : AppCompatActivity() {
         if (!hasPermissions(this, PERMISSIONS)) {
             requestPermissions(PERMISSIONS, REQUEST_ALL_PERMISSION)
         }
-
-
         initObserver(binding)
 
 
-
+        val bundle = Bundle()
+        bundle.putString("Key", "Hello FragmentA")
+        fragmentChart.arguments = bundle
+        val transaction = supportFragmentManager.beginTransaction()
+        transaction.add(R.id.frameLayout, fragmentChart)
+        transaction.commit()
 
     }
 
@@ -118,9 +123,10 @@ class MainActivity : AppCompatActivity() {
         })
 
         viewModel.readTxt.observe(this,{
-
            binding.txtRead.append(it)
-            
+            //        출처: https://juahnpop.tistory.com/225 [Blacklog] - communication btw activity and fragment
+//            fragmentChart.updateChartData(it)
+
             if ((binding.txtRead.measuredHeight - binding.scroller.scrollY) <=
                 (binding.scroller.height + binding.txtRead.lineHeight)) {
                 binding.scroller.post {
@@ -129,6 +135,13 @@ class MainActivity : AppCompatActivity() {
             }
 
         })
+
+        viewModel.readSensor.observe(this,{
+//        출처: https://juahnpop.tistory.com/225 [Blacklog] - communication btw activity and fragment
+            fragmentChart.updateChartData(it)
+        })
+
+
 
         //Opening new activity
         viewModel.openEvent.observe(this,{
@@ -208,11 +221,4 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-
-
-    //Joonhwa Choi Tried:
-//    fun Transfer2ChatActivity(){
-//        var intent = Intent(this, ChartActivity::class.java)
-//        startActivity(intent)
-//    }
 }
