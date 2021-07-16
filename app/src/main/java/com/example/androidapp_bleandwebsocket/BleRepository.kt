@@ -291,20 +291,18 @@ class BleRepository {
             val dateAndtime: LocalDateTime = LocalDateTime.now()
 //            val TimeStampFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss.SSS")
 
-
-            webSocketClient.send(
-                //data frame
-                //my pick: id, message_type,time, sensor1/datainfo(ex: uint16_t:sampling rate=50Hz)/data(0:1:2:3:...:N),sensor2/datatype(ex: double)/data(0:1:2:3:...:M),
-//                "android_test,0,${shorts[0]},${shorts[1]},1,0"
-                "android_test,(message_type),${dateAndtime},ECG/uint16_t/20/${shorts[0]}:${shorts[1]}:${shorts[2]}:${shorts[3]}:${shorts[4]},Temperature/int16_t/1000/${shorts[0]},BldPrs/uint16_t/1000/${shorts[0]}"
-//                "android_test,(message_type),${dateAndtime.format(TimeStampFormatter)},ECG/uint16_t/20ms/${shorts[0]}:${shorts[1]}:${shorts[2]}:${shorts[3]}:${shorts[4]},Temperature/int16_t/1000ms/${shorts[0]},BldPrs/uint16_t/1000ms/${shorts[0]}"
-             )
-
-//            txtRead = byteArray.copyOfRange(1,2).contentToString()
-//            Log.d(TAG, "read: $msg")
-//            Log.d(TAG, "read: "+byteArray.contentToString())
-
-
+            try{
+                if(webSocketClient?.isOpen() == true) {
+                    webSocketClient?.send(
+                        //data frame
+                        //my pick: id, message_type,time, sensor1/datainfo(ex: uint16_t:sampling rate=50Hz)/data(0:1:2:3:...:N),sensor2/datatype(ex: double)/data(0:1:2:3:...:M),
+                        //"android_test,(message_type),${dateAndtime.format(TimeStampFormatter)},ECG/uint16_t/20ms/${shorts[0]}:${shorts[1]}:${shorts[2]}:${shorts[3]}:${shorts[4]},Temperature/int16_t/1000ms/${shorts[0]},BldPrs/uint16_t/1000ms/${shorts[0]}"
+                        "android_test,(message_type),${dateAndtime},ECG/uint16_t/20/${shorts[0]}:${shorts[1]}:${shorts[2]}:${shorts[3]}:${shorts[4]},Temperature/int16_t/1000/${shorts[0]},BldPrs/uint16_t/1000/${shorts[0]}"
+                    )
+                }
+            } catch(e:NumberFormatException){
+                return
+            }
             Log.d(TAG, "read: "+txtRead)
             isTxtRead = true
         }
@@ -339,7 +337,7 @@ class BleRepository {
             isStatusChange = true
             isConnect.postValue(Event(false))
         }
-        webSocketClient.close()
+        webSocketClient?.close()
 
     }
 
@@ -365,7 +363,8 @@ class BleRepository {
     // 전역 변수로 바인딩 객체 선언
     // 매번 null 체크를 할 필요 없이 편의성을 위해 바인딩 변수 재 선언
 //    private val binding get() = mBinding!!
-    private lateinit var webSocketClient: WebSocketClient
+//    private lateinit var webSocketClient: WebSocketClient
+    private var webSocketClient: WebSocketClient? = null
 
     companion object {
         const val WEBSOCKET_ECHO_URL = "wss://echo.websocket.org"
@@ -376,8 +375,12 @@ class BleRepository {
     private fun initWebSocket_LiveDB() {
         val URI_LiveDB: URI? = URI(WEBSOCKET_LIVEDB_JOONHWA_URL)
         Log.d(TAG, "initWebSocket_LiveDB")
-        createWebSocketClient(URI_LiveDB)
-        webSocketClient.connect()
+        try{
+            createWebSocketClient(URI_LiveDB)
+            webSocketClient?.connect()
+        } catch(e:NumberFormatException){
+            return
+        }
     }
 
     private fun createWebSocketClient(coinbaseUri: URI?) {

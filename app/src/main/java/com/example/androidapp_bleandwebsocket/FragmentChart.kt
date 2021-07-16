@@ -12,6 +12,7 @@ import android.graphics.Color
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
+import com.github.mikephil.charting.components.YAxis
 
 import com.example.androidapp_bleandwebsocket.databinding.FragmentChartBinding
 import com.example.androidapp_bleandwebsocket.main.MainActivity
@@ -177,6 +178,12 @@ class FragmentChart : Fragment() {
                 Chart_data?.notifyDataChanged()
                 binding.lineChart.notifyDataSetChanged()
                 binding.lineChart.invalidate()
+
+                binding.lineChart.setVisibleXRangeMaximum(500f);
+                // this automatically refreshes the chart (calls invalidate())
+                binding.lineChart.moveViewTo(Chart_data!!.getEntryCount().toFloat(), 0.0f, YAxis.AxisDependency.LEFT);
+//                binding.lineChart.moveViewTo(Chart_data!!.getEntryCount().toFloat(), 0.0f, binding.lineChart.getAxisLeft().AxisDependency.LEFT);
+
             }
 //            binding.startButton.text = "난수 생성 시작"
             binding.startButton.isClickable = true

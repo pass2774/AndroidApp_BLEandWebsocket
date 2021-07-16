@@ -123,9 +123,9 @@ class MainActivity : AppCompatActivity() {
         })
 
         viewModel.readTxt.observe(this,{
-           binding.txtRead.append(it)
-            //        출처: https://juahnpop.tistory.com/225 [Blacklog] - communication btw activity and fragment
-//            fragmentChart.updateChartData(it)
+
+//            binding.txtRead.append(it)
+            binding.txtRead.setText(it)
 
             if ((binding.txtRead.measuredHeight - binding.scroller.scrollY) <=
                 (binding.scroller.height + binding.txtRead.lineHeight)) {
