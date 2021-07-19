@@ -107,7 +107,10 @@ dependencies {
 //        exclude group: 'org.json', module: 'json'
 //    }
 
-    //For MPAndroidChart
+    //For MPAndroidChart - Joonhwa Choi
     implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
+
+    // CSV file - Joonhwa Choi
+    implementation 'com.opencsv:opencsv:4.4'
 
 }

@@ -57,6 +57,8 @@ class BleRepository {
 
     var isStatusChange: Boolean = false
     var isTxtRead: Boolean = false
+    var isSensorRead: Boolean = false
+
     fun fetchReadText() = flow{
         while(true) {
             if(isTxtRead) {
@@ -68,10 +70,10 @@ class BleRepository {
     }.flowOn(Dispatchers.Default)
     fun fetchReadSensor() = flow{
         while(true) {
-            if(isTxtRead) {
+            if(isSensorRead) {
 //                emit(txtRead)
                 emit(sensorRead)
-                isTxtRead = false
+                isSensorRead = false
             }
         }
     }.flowOn(Dispatchers.Default)
@@ -287,7 +289,10 @@ class BleRepository {
 
             val shorts = msg.asList().chunked(2).map{ (l, h) -> (l.toUInt() + h.toUInt().shl(8)).toUShort() }.toUShortArray()
             sensorRead=shorts
-            txtRead=shorts.contentToString()
+//            txtRead=shorts.contentToString() // --> [a, b, c]
+//            txtRead=shorts.JoinToString(prefix="<",separator = "|",postfix=">") //--> <a|b|c>
+            txtRead=shorts.joinToString(prefix="",separator = ",",postfix="")
+
             val dateAndtime: LocalDateTime = LocalDateTime.now()
 //            val TimeStampFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss.SSS")
 
@@ -305,6 +310,7 @@ class BleRepository {
             }
             Log.d(TAG, "read: "+txtRead)
             isTxtRead = true
+            isSensorRead = true
         }
 
 

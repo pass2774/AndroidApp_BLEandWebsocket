@@ -31,8 +31,11 @@ import com.example.androidapp_bleandwebsocket.viewmodel.MainViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import com.example.androidapp_bleandwebsocket.util.Event
 import com.example.androidapp_bleandwebsocket.FragmentChart
+import com.example.androidapp_bleandwebsocket.CsvHelperSAF
 
-
+import android.net.Uri
+import java.io.FileOutputStream
+import kotlinx.coroutines.*
 ////For Websocket
 //import com.squareup.moshi.JsonAdapter
 //import com.squareup.moshi.Moshi
@@ -44,11 +47,26 @@ import com.example.androidapp_bleandwebsocket.FragmentChart
 //import javax.net.ssl.SSLSocketFactory
 
 class MainActivity : AppCompatActivity() {
+//    출처: https://namget.tistory.com/entry/코틀린-mvvm패턴-속-application-context-가져오기 [남갯,YTS의 개발,일상블로그]
+    lateinit var context: Context
+    init{
+        instance = this
+    }
+    companion object {
+        private var instance: MainActivity? = null
+        fun applicationContext() : Context {
+            return instance!!.applicationContext
+        }
+    }
 
     private val viewModel by viewModel<MainViewModel>()
     private var adapter: BleListAdapter? = null
     val fragmentChart = FragmentChart()
 
+    //테스트용 파일명1 & 2
+    val WRITE_REQUEST_CODE: Int = 43
+    lateinit var Uri_CsvFile: Uri
+    lateinit var csvHelperSAF: CsvHelperSAF
 
 
     @RequiresApi(Build.VERSION_CODES.M)
@@ -90,6 +108,14 @@ class MainActivity : AppCompatActivity() {
         transaction.add(R.id.frameLayout, fragmentChart)
         transaction.commit()
 
+
+        val fileName = "CsvTest.csv"   // 1
+        val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {  // 2
+            addCategory(Intent.CATEGORY_OPENABLE)   // 3
+            type = "text/csv"    // 4
+            putExtra(Intent.EXTRA_TITLE, fileName)   // 5
+        }
+        startActivityForResult(intent, WRITE_REQUEST_CODE)    // 6
     }
 
 
@@ -126,7 +152,8 @@ class MainActivity : AppCompatActivity() {
 
 //            binding.txtRead.append(it)
             binding.txtRead.setText(it)
-
+//            writeSensorDataToCsv(Uri_CsvFile, it)
+            csvHelperSAF.writeSensorDataToCsv(it)
             if ((binding.txtRead.measuredHeight - binding.scroller.scrollY) <=
                 (binding.scroller.height + binding.txtRead.lineHeight)) {
                 binding.scroller.post {
@@ -141,8 +168,6 @@ class MainActivity : AppCompatActivity() {
             fragmentChart.updateChartData(it)
         })
 
-
-
         //Opening new activity
         viewModel.openEvent.observe(this,{
             it.getContentIfNotHandled()?.let{ connect->
@@ -150,14 +175,20 @@ class MainActivity : AppCompatActivity() {
 //            intent.putExtra("sample", sampleText)
                 startActivity(intent)
             }
-//            Toast.makeText(this, "SiiiiiiBAL", Toast.LENGTH_SHORT).show()
         })
-
-//        viewModel.openEvent.eventObserve(this,{ sampleText ->
-//            var intent = Intent(this, ChartActivity::class.java)
-//            startActivity(intent)
-//        })
     }
+    override fun onActivityResult(requestCode: Int, resultCode: Int, resultData: Intent?) {
+        super.onActivityResult(requestCode, resultCode, resultData)
+        if (requestCode == WRITE_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+            resultData?.data?.also { uri ->
+                Log.i("SAF", "Uri: $uri")
+//                Uri_CsvFile=uri
+                //writeCsv(uri)
+                csvHelperSAF = CsvHelperSAF(uri)
+            }
+        }
+    }
+
     override fun onResume() {
         super.onResume()
         // finish app if the BLE is not supported
