@@ -31,11 +31,17 @@ import com.example.androidapp_bleandwebsocket.viewmodel.MainViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import com.example.androidapp_bleandwebsocket.util.Event
 import com.example.androidapp_bleandwebsocket.FragmentChart
+//For CSV file logging using SAF(Storage Accesss Framework)
 import com.example.androidapp_bleandwebsocket.CsvHelperSAF
-
 import android.net.Uri
 import java.io.FileOutputStream
 import kotlinx.coroutines.*
+
+//For Foreground service
+import com.example.androidapp_bleandwebsocket.BleManagerAction
+import com.example.androidapp_bleandwebsocket.BleManagerService
+import com.example.androidapp_bleandwebsocket.BleManagerNofitication
+
 ////For Websocket
 //import com.squareup.moshi.JsonAdapter
 //import com.squareup.moshi.Moshi
@@ -170,6 +176,12 @@ class MainActivity : AppCompatActivity() {
 
         //Opening new activity
         viewModel.openEvent.observe(this,{
+            //Joonhwa Choi - practicing foreground service
+            val intent = Intent(this@MainActivity, BleManagerService::class.java)
+            intent.action = BleManagerAction.START_FOREGROUND
+            startService(intent)
+
+
             it.getContentIfNotHandled()?.let{ connect->
                 var intent = Intent(this, ChartActivity::class.java)
 //            intent.putExtra("sample", sampleText)
