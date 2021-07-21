@@ -42,6 +42,12 @@ import com.example.androidapp_bleandwebsocket.BleManagerAction
 import com.example.androidapp_bleandwebsocket.BleManagerService
 import com.example.androidapp_bleandwebsocket.BleManagerNofitication
 
+
+//For bound Service
+import android.content.ComponentName
+import android.content.ServiceConnection
+import android.os.IBinder
+
 ////For Websocket
 //import com.squareup.moshi.JsonAdapter
 //import com.squareup.moshi.Moshi
@@ -69,10 +75,26 @@ class MainActivity : AppCompatActivity() {
     private var adapter: BleListAdapter? = null
     val fragmentChart = FragmentChart()
 
-    //테스트용 파일명1 & 2
+    //CSV file R/W with SAF
     val WRITE_REQUEST_CODE: Int = 43
     lateinit var Uri_CsvFile: Uri
     lateinit var csvHelperSAF: CsvHelperSAF
+
+    // *Important! Bound service
+    // *REF:https://github.com/uberchilly/BoundServiceMVVM
+    private lateinit var mService: BleManagerService
+    private var mBound: Boolean = false
+    private val connection = object : ServiceConnection {
+        override fun onServiceConnected(className: ComponentName, service: IBinder) {
+            // We've bound to LocalService, cast the IBinder and get LocalService instance
+            val binder = service as BleManagerService.LocalBinder
+            mService = binder.getService()
+            mBound = true
+        }
+        override fun onServiceDisconnected(arg0: ComponentName) {
+            mBound = false
+        }
+    }
 
 
     @RequiresApi(Build.VERSION_CODES.M)
@@ -88,7 +110,6 @@ class MainActivity : AppCompatActivity() {
         binding.rvBleList.setHasFixedSize(true)
         val layoutManager: RecyclerView.LayoutManager = LinearLayoutManager(this)
         binding.rvBleList.layoutManager = layoutManager
-
 
         adapter = BleListAdapter()
         binding.rvBleList.adapter = adapter
@@ -114,7 +135,8 @@ class MainActivity : AppCompatActivity() {
         transaction.add(R.id.frameLayout, fragmentChart)
         transaction.commit()
 
-
+        // To Do: CSV file logging does not run on background, because it is on view'activity'
+        // --> move it to model part
         val fileName = "CsvTest.csv"   // 1
         val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {  // 2
             addCategory(Intent.CATEGORY_OPENABLE)   // 3
@@ -176,11 +198,10 @@ class MainActivity : AppCompatActivity() {
 
         //Opening new activity
         viewModel.openEvent.observe(this,{
-            //Joonhwa Choi - practicing foreground service
-            val intent = Intent(this@MainActivity, BleManagerService::class.java)
-            intent.action = BleManagerAction.START_FOREGROUND
-            startService(intent)
-
+            //Joonhwa Choi - practicing foreground service - cancelled
+//            val intent = Intent(this@MainActivity, BleManagerService::class.java)
+//            intent.action = BleManagerAction.START_FOREGROUND
+//            startService(intent)
 
             it.getContentIfNotHandled()?.let{ connect->
                 var intent = Intent(this, ChartActivity::class.java)
@@ -215,6 +236,25 @@ class MainActivity : AppCompatActivity() {
 
     override fun onDestroy() { // onDestroy 에서 binding class 인스턴스 참조를 정리해주어야 한다.
         super.onDestroy()
+    }
+
+    // Added by Joonhwa Choi for service binding, from https://github.com/uberchilly/BoundServiceMVVM
+    override fun onStart() {
+        super.onStart()
+        viewModel.onStart()
+        // Bind to LocalService
+        Intent(this, BleManagerService::class.java).also { intent ->
+            bindService(intent, connection, Context.BIND_AUTO_CREATE)
+        }
+    }
+    // Added by Joonhwa Choi for service binding, from https://github.com/uberchilly/BoundServiceMVVM
+    override fun onStop() {
+        super.onStop()
+        if (!isChangingConfigurations) {
+            unbindService(connection)
+            mBound = false
+        }
+        viewModel.onStop()
     }
 
 

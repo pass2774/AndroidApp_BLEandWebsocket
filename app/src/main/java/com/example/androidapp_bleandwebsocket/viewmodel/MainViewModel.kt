@@ -62,7 +62,14 @@ class MainViewModel(private val bleRepository: BleRepository) : ViewModel() {
         bleRepository.connectDevice(bluetoothDevice)
     }
 
+    // Added by Joonhwa Choi for service binding, from https://github.com/uberchilly/BoundServiceMVVM
+    fun onStart() {
+//        bleRepository.addConnectionListener(this)
+    }
 
+    fun onStop() {
+//        bleRepository.removeConnectionListener(this)
+    }
 
 
     fun onClickWrite(){
