@@ -14,6 +14,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.annotation.MainThread
+import com.example.androidapp_bleandwebsocket.CsvHelperSAF
 
 class MainViewModel(private val bleRepository: BleRepository) : ViewModel() {
     val statusTxt: LiveData<String>
@@ -69,6 +70,10 @@ class MainViewModel(private val bleRepository: BleRepository) : ViewModel() {
 
     fun onStop() {
 //        bleRepository.removeConnectionListener(this)
+    }
+
+    fun transferUriInfo(csvHelperSAF:CsvHelperSAF){
+        bleRepository.csvHelperSAF = csvHelperSAF
     }
 
 

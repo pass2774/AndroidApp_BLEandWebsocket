@@ -158,8 +158,6 @@ class MainActivity : AppCompatActivity() {
                 adapter?.setItem(scanResults)
             }
         })
-
-
         viewModel._isScanning.observe(this,{
             it.getContentIfNotHandled()?.let{ scanning->
                 viewModel.isScanning.set(scanning)
@@ -180,8 +178,8 @@ class MainActivity : AppCompatActivity() {
 
 //            binding.txtRead.append(it)
             binding.txtRead.setText(it)
-//            writeSensorDataToCsv(Uri_CsvFile, it)
-            csvHelperSAF.writeSensorDataToCsv(it)
+//            csvHelperSAF.writeSensorDataToCsv(it)
+
             if ((binding.txtRead.measuredHeight - binding.scroller.scrollY) <=
                 (binding.scroller.height + binding.txtRead.lineHeight)) {
                 binding.scroller.post {
@@ -218,6 +216,7 @@ class MainActivity : AppCompatActivity() {
 //                Uri_CsvFile=uri
                 //writeCsv(uri)
                 csvHelperSAF = CsvHelperSAF(uri)
+                viewModel.transferUriInfo(csvHelperSAF)
             }
         }
     }

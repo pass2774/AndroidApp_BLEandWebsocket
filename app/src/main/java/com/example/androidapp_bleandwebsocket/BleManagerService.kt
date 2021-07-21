@@ -50,25 +50,8 @@ class BleManagerService : Service() {
 //        stopSelf()
 //    }
     private fun startNotification() {
-//Notification example 1
         val notification = BleManagerNofitication.createNotification(this)
         startForeground(NOTIFICATION_ID, notification)
-// Notification example 2
-//        https://proandroiddev.com/bound-and-foreground-services-in-android-a-step-by-step-guide-5f8362f4ae20
-//        val channel = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-//            NotificationChannel(
-//                CHANNEL_ID,
-//                "My Channel",
-//                NotificationManager.IMPORTANCE_DEFAULT
-//            )
-//        } else {
-//            TODO("VERSION.SDK_INT < O")
-//        }
-//        (getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).createNotificationChannel(channel)
-//        val notification: Notification = NotificationCompat.Builder(this, CHANNEL_ID)
-//            .setContentTitle("A service is running in the background")
-//            .setContentText("Generating random number").build()
-//        startForeground(NOTIFICATION_ID, notification)
     }
 
     override fun onCreate() {

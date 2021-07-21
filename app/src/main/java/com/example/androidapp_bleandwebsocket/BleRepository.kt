@@ -34,6 +34,7 @@ import javax.net.ssl.SSLSocketFactory
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import com.example.androidapp_bleandwebsocket.CsvHelperSAF
 
 class BleRepository {
 
@@ -58,6 +59,8 @@ class BleRepository {
     var isStatusChange: Boolean = false
     var isTxtRead: Boolean = false
     var isSensorRead: Boolean = false
+
+    var csvHelperSAF:CsvHelperSAF? = null
 
     fun fetchReadText() = flow{
         while(true) {
@@ -292,6 +295,9 @@ class BleRepository {
 //            txtRead=shorts.contentToString() // --> [a, b, c]
 //            txtRead=shorts.JoinToString(prefix="<",separator = "|",postfix=">") //--> <a|b|c>
             txtRead=shorts.joinToString(prefix="",separator = ",",postfix="")
+            csvHelperSAF?.let{
+                it.writeSensorDataToCsv(txtRead)
+            }
 
             val dateAndtime: LocalDateTime = LocalDateTime.now()
 //            val TimeStampFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss.SSS")
@@ -312,8 +318,6 @@ class BleRepository {
             isTxtRead = true
             isSensorRead = true
         }
-
-
     }
 
     /**
@@ -344,7 +348,6 @@ class BleRepository {
             isConnect.postValue(Event(false))
         }
         webSocketClient?.close()
-
     }
 
     fun writeData(cmdByteArray: ByteArray){
@@ -423,7 +426,5 @@ class BleRepository {
             }
         }
     }
-
-
 }
 
