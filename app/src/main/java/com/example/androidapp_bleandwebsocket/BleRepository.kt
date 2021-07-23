@@ -18,6 +18,8 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import java.util.*
 import kotlin.concurrent.schedule
+import com.example.androidapp_bleandwebsocket.BleConstants.*
+
 
 
 //For Websocket
@@ -35,6 +37,11 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import com.example.androidapp_bleandwebsocket.CsvHelperSAF
+
+
+import android.os.Handler
+import android.os.Looper
+
 
 class BleRepository {
 
@@ -55,10 +62,12 @@ class BleRepository {
     var statusTxt: String = ""
     var txtRead: String = ""
     lateinit var sensorRead: Collection<UShort>
+    lateinit var sensor2Read: Collection<UInt>
 
     var isStatusChange: Boolean = false
     var isTxtRead: Boolean = false
     var isSensorRead: Boolean = false
+    var isSensor2Read: Boolean = false
 
     var csvHelperSAF:CsvHelperSAF? = null
 
@@ -224,7 +233,7 @@ class BleRepository {
             Log.d(TAG, "Services discovery is successful")
             isConnect.postValue(Event(true))
             // find command characteristics from the GATT server
-            val respCharacteristic = gatt?.let { BluetoothUtils.findResponseCharacteristic(it) }
+            val respCharacteristic = gatt?.let { BluetoothUtils.findResponseCharacteristic(it,CHARACTERISTIC_READ_SENSOR1_STRING) }
             // disconnect if the characteristic is not found
             if( respCharacteristic == null ) {
                 Log.e(TAG, "Unable to find cmd characteristic")
@@ -232,12 +241,42 @@ class BleRepository {
                 return
             }
             gatt.setCharacteristicNotification(respCharacteristic, true)
+
+            val respCharacteristic2 = gatt?.let { BluetoothUtils.findResponseCharacteristic(it,CHARACTERISTIC_READ_SENSOR2_STRING) }
+            // disconnect if the characteristic is not found
+            if( respCharacteristic2 == null ) {
+                Log.e(TAG, "Unable to find cmd characteristic")
+                disconnectGattServer()
+                return
+            }
+            gatt.setCharacteristicNotification(respCharacteristic2, true)
+
+
             // UUID for notification
             val descriptor: BluetoothGattDescriptor = respCharacteristic.getDescriptor(
                 UUID.fromString(CLIENT_CHARACTERISTIC_CONFIG)
             )
             descriptor.value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
             gatt.writeDescriptor(descriptor)
+
+            // UUID for notification
+            val descriptor2: BluetoothGattDescriptor = respCharacteristic2.getDescriptor(
+                UUID.fromString(CLIENT_CHARACTERISTIC_CONFIG)
+            )
+
+            descriptor2.value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
+            Log.e(TAG, "Go!!")
+            val handler = Handler(Looper.getMainLooper())
+            handler.postDelayed({
+                if(gatt.writeDescriptor(descriptor2)){
+                    Log.e(TAG, "Success ...writeDescriptor")
+                }else{
+                    Log.e(TAG, "Fail ...writeDescriptor")
+                }
+            }, 500)
+
+
+
         }
 
         override fun onCharacteristicChanged(
@@ -245,8 +284,11 @@ class BleRepository {
             characteristic: BluetoothGattCharacteristic
         ) {
             super.onCharacteristicChanged(gatt, characteristic)
-            //Log.d(TAG, "characteristic changed: " + characteristic.uuid.toString())
-            readCharacteristic(characteristic)
+            Log.d(TAG, "characteristic changed: " + characteristic.uuid.toString())
+            when(characteristic.uuid.toString()){
+                CHARACTERISTIC_READ_SENSOR1_STRING -> readSensor1Characteristic(characteristic)
+                CHARACTERISTIC_READ_SENSOR2_STRING -> readSensor2Characteristic(characteristic)
+            }
         }
 
         override fun onCharacteristicWrite(
@@ -271,7 +313,8 @@ class BleRepository {
             super.onCharacteristicRead(gatt, characteristic, status)
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 Log.d(TAG, "Characteristic read successfully")
-                readCharacteristic(characteristic)
+                readSensor1Characteristic(characteristic)
+                readSensor2Characteristic(characteristic)
             } else {
                 Log.e(TAG, "Characteristic read unsuccessful, status: $status")
                 // Trying to read from the Time Characteristic? It doesnt have the property or permissions
@@ -285,7 +328,7 @@ class BleRepository {
          * @param characteristic
          */
 
-        private fun readCharacteristic(characteristic: BluetoothGattCharacteristic) {
+        private fun readSensor1Characteristic(characteristic: BluetoothGattCharacteristic) {
             var msg = characteristic.value
 //            txtRead = msg.toString()+"\n" //Original code
 //            txtRead =msg.contentToString()
@@ -295,6 +338,7 @@ class BleRepository {
 //            txtRead=shorts.contentToString() // --> [a, b, c]
 //            txtRead=shorts.JoinToString(prefix="<",separator = "|",postfix=">") //--> <a|b|c>
             txtRead=shorts.joinToString(prefix="",separator = ",",postfix="")
+            txtRead="Sensor1:"+txtRead
             csvHelperSAF?.let{
                 it.writeSensorDataToCsv(txtRead)
             }
@@ -318,7 +362,41 @@ class BleRepository {
             isTxtRead = true
             isSensorRead = true
         }
+        private fun readSensor2Characteristic(characteristic: BluetoothGattCharacteristic) {
+            var msg = characteristic.value
+//            val shorts = msg.asList().chunked(2).map{ (l, h) -> (l.toUInt() + h.toUInt().shl(8)).toUShort() }.toUShortArray()
+            val ints = msg.asList().chunked(4).map{ (byte0,byte1,byte2,byte3) -> (byte0.toUInt()+byte1.toUInt().shl(8)+byte2.toUInt().shl(16)+byte3.toUInt().shl(24)) }.toUIntArray()
+            sensor2Read=ints
+//            txtRead=shorts.contentToString() // --> [a, b, c]
+//            txtRead=shorts.JoinToString(prefix="<",separator = "|",postfix=">") //--> <a|b|c>
+            txtRead=ints.joinToString(prefix="",separator = ",",postfix="")
+            txtRead="\nSensor2:"+txtRead
+            csvHelperSAF?.let{
+                it.writeSensorDataToCsv(txtRead)
+            }
+
+            val dateAndtime: LocalDateTime = LocalDateTime.now()
+//            val TimeStampFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss.SSS")
+
+//            try{
+//                if(webSocketClient?.isOpen() == true) {
+//                    webSocketClient?.send(
+//                        //data frame
+//                        //my pick: id, message_type,time, sensor1/datainfo(ex: uint16_t:sampling rate=50Hz)/data(0:1:2:3:...:N),sensor2/datatype(ex: double)/data(0:1:2:3:...:M),
+//                        //"android_test,(message_type),${dateAndtime.format(TimeStampFormatter)},ECG/uint16_t/20ms/${shorts[0]}:${shorts[1]}:${shorts[2]}:${shorts[3]}:${shorts[4]},Temperature/int16_t/1000ms/${shorts[0]},BldPrs/uint16_t/1000ms/${shorts[0]}"
+//                        "android_test,(message_type),${dateAndtime},ECG/uint16_t/20/${shorts[0]}:${shorts[1]}:${shorts[2]}:${shorts[3]}:${shorts[4]},Temperature/int16_t/1000/${shorts[0]},BldPrs/uint16_t/1000/${shorts[0]}"
+//                    )
+//                }
+//            } catch(e:NumberFormatException){
+//                return
+//            }
+            Log.d(TAG, "read: "+txtRead)
+            isTxtRead = true
+            isSensor2Read = true
+        }
     }
+
+
 
     /**
      * Connect to the ble device

@@ -22,9 +22,9 @@ import androidx.core.app.ActivityCompat
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.androidapp_bleandwebsocket.PERMISSIONS
+import com.example.androidapp_bleandwebsocket.BleConstants.PERMISSIONS
 import com.example.androidapp_bleandwebsocket.R
-import com.example.androidapp_bleandwebsocket.REQUEST_ALL_PERMISSION
+import com.example.androidapp_bleandwebsocket.BleConstants.REQUEST_ALL_PERMISSION
 import com.example.androidapp_bleandwebsocket.adapter.BleListAdapter
 import com.example.androidapp_bleandwebsocket.databinding.ActivityMainBinding
 import com.example.androidapp_bleandwebsocket.viewmodel.MainViewModel

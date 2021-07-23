@@ -3,9 +3,9 @@ package com.example.androidapp_bleandwebsocket.util
 import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.BluetoothGattService
-import com.example.androidapp_bleandwebsocket.CHARACTERISTIC_COMMAND_STRING
-import com.example.androidapp_bleandwebsocket.CHARACTERISTIC_RESPONSE_STRING
-import com.example.androidapp_bleandwebsocket.SERVICE_STRING
+import com.example.androidapp_bleandwebsocket.BleConstants.CHARACTERISTIC_COMMAND_STRING
+import com.example.androidapp_bleandwebsocket.BleConstants.CHARACTERISTIC_RESPONSE_STRING
+import com.example.androidapp_bleandwebsocket.BleConstants.SERVICE_STRING
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -44,8 +44,12 @@ class BluetoothUtils {
          * @param gatt gatt instance
          * @return found characteristic
          */
-        fun findResponseCharacteristic(gatt: BluetoothGatt): BluetoothGattCharacteristic? {
-            return findCharacteristic(gatt, CHARACTERISTIC_RESPONSE_STRING)
+//        fun findResponseCharacteristic(gatt: BluetoothGatt): BluetoothGattCharacteristic? {
+//            return findCharacteristic(gatt, CHARACTERISTIC_RESPONSE_STRING)
+//        }
+        //Modified by Joonhwa Choi
+        fun findResponseCharacteristic(gatt: BluetoothGatt, ChacteristicUuid: String): BluetoothGattCharacteristic? {
+            return findCharacteristic(gatt, ChacteristicUuid)
         }
 
         /**
