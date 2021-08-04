@@ -21,6 +21,10 @@ class MainViewModel(private val bleRepository: BleRepository) : ViewModel() {
         get() = bleRepository.fetchStatusText().asLiveData(viewModelScope.coroutineContext)
     val readTxt: LiveData<String>
         get() = bleRepository.fetchReadText().asLiveData(viewModelScope.coroutineContext)
+    val readTxt2: LiveData<String>
+        get() = bleRepository.fetchReadText2().asLiveData(viewModelScope.coroutineContext)
+    val readTxt3: LiveData<String>
+        get() = bleRepository.fetchReadText3().asLiveData(viewModelScope.coroutineContext)
     //Joonhwa - new livedata
     val readSensor: LiveData<Collection<UShort>>
         get() = bleRepository.fetchReadSensor().asLiveData(viewModelScope.coroutineContext)

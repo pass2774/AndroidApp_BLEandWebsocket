@@ -175,19 +175,23 @@ class MainActivity : AppCompatActivity() {
         })
 
         viewModel.readTxt.observe(this,{
-
 //            binding.txtRead.append(it)
             binding.txtRead.setText(it)
-//            csvHelperSAF.writeSensorDataToCsv(it)
-
             if ((binding.txtRead.measuredHeight - binding.scroller.scrollY) <=
                 (binding.scroller.height + binding.txtRead.lineHeight)) {
                 binding.scroller.post {
                     binding.scroller.smoothScrollTo(0, binding.txtRead.bottom)
                 }
             }
-
         })
+
+        viewModel.readTxt2.observe(this,{
+            binding.txtRead2.setText(it)
+        })
+        viewModel.readTxt3.observe(this,{
+            binding.txtRead3.setText(it)
+        })
+
 
         viewModel.readSensor.observe(this,{
 //        출처: https://juahnpop.tistory.com/225 [Blacklog] - communication btw activity and fragment

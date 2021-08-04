@@ -97,7 +97,7 @@
         <ScrollView
             android:id="@+id/scroller"
             android:layout_width="match_parent"
-            android:layout_height="150dp"
+            android:layout_height="40dp"
             android:layout_marginTop="10dp"
             android:background="@color/lilly_color4">
             <TextView
@@ -107,7 +107,24 @@
                 android:layout_marginStart="10dp"
                 android:lineSpacingExtra="7dp"
                 android:textColor="@color/white" />
+
         </ScrollView>
+        <TextView
+            android:id="@+id/txt_read2"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_margin="1dp"
+            android:lineSpacingExtra="7dp"
+            android:background="@color/lilly_color4"
+            android:textColor="@color/white" />
+        <TextView
+            android:id="@+id/txt_read3"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_margin="1dp"
+            android:lineSpacingExtra="7dp"
+            android:background="@color/lilly_color4"
+            android:textColor="@color/white" />
 <!--        <fragment-->
 <!--            android:id="@+id/fragment_test"-->
 <!--            android:layout_width="match_parent"-->

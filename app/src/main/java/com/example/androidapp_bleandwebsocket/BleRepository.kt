@@ -61,13 +61,19 @@ class BleRepository {
 
     var statusTxt: String = ""
     var txtRead: String = ""
+    var txtRead2: String = ""
+    var txtRead3: String = ""
     lateinit var sensorRead: Collection<UShort>
-    lateinit var sensor2Read: Collection<UInt>
+    lateinit var sensor2Read: Collection<Int>
+    lateinit var sensor3Read: Collection<Int>
 
     var isStatusChange: Boolean = false
     var isTxtRead: Boolean = false
+    var isTxtRead2: Boolean = false
+    var isTxtRead3: Boolean = false
     var isSensorRead: Boolean = false
     var isSensor2Read: Boolean = false
+    var isSensor3Read: Boolean = false
 
     var csvHelperSAF:CsvHelperSAF? = null
 
@@ -77,6 +83,22 @@ class BleRepository {
                 emit(txtRead)
 //                emit(sensorRead.contentToString())
                 isTxtRead = false
+            }
+        }
+    }.flowOn(Dispatchers.Default)
+    fun fetchReadText2() = flow{
+        while(true) {
+            if(isTxtRead2) {
+                emit(txtRead2)
+                isTxtRead2 = false
+            }
+        }
+    }.flowOn(Dispatchers.Default)
+    fun fetchReadText3() = flow{
+        while(true) {
+            if(isTxtRead3) {
+                emit(txtRead3)
+                isTxtRead3 = false
             }
         }
     }.flowOn(Dispatchers.Default)
@@ -273,7 +295,7 @@ class BleRepository {
                 }else{
                     Log.e(TAG, "Fail ...writeDescriptor")
                 }
-            }, 500)
+            }, 1000)
 
 
 
@@ -363,16 +385,23 @@ class BleRepository {
             isSensorRead = true
         }
         private fun readSensor2Characteristic(characteristic: BluetoothGattCharacteristic) {
-            var msg = characteristic.value
-//            val shorts = msg.asList().chunked(2).map{ (l, h) -> (l.toUInt() + h.toUInt().shl(8)).toUShort() }.toUShortArray()
-            val ints = msg.asList().chunked(4).map{ (byte0,byte1,byte2,byte3) -> (byte0.toUInt()+byte1.toUInt().shl(8)+byte2.toUInt().shl(16)+byte3.toUInt().shl(24)) }.toUIntArray()
-            sensor2Read=ints
-//            txtRead=shorts.contentToString() // --> [a, b, c]
-//            txtRead=shorts.JoinToString(prefix="<",separator = "|",postfix=">") //--> <a|b|c>
-            txtRead=ints.joinToString(prefix="",separator = ",",postfix="")
-            txtRead="\nSensor2:"+txtRead
+            var msg = characteristic.value.toList()
+            val ints_imu = msg.subList(0,8).chunked(2).map{ (l, h) -> (l.toUInt().shl(8) + h.toUInt()).toShort().toInt() }.t11oIntArray()
+            val ints_barro = msg.subList(8,20).chunked(4).map{ (byte0,byte1,byte2,byte3) -> (byte0.toUInt().shl(24)+byte1.toUInt().shl(16)+byte2.toUInt().shl(8)+byte3.toUInt()).toInt() }.toIntArray()
+//            val ints = msg.asList().chunked(4).map{ (byte0,byte1,byte2,byte3) -> (byte0.toUInt().shl(24)+byte1.toUInt().shl(16)+byte2.toUInt().shl(8)+byte3.toUInt()) }.toUIntArray()
+//            sensor2Read=ints
+//            sensor2Read=ints_imu.toList().toCollection((ArrayList()))
+//            sensor2Read=ints_imu.toList()
+            sensor2Read=ints_imu.toList().toCollection((ArrayList()))
+            sensor3Read=ints_barro.toList().toCollection((ArrayList()))
+            Log.d(TAG, "read!!: "+txtRead2.toString())
+            txtRead2=sensor2Read.joinToString(prefix="",separator = ",",postfix="")
+            txtRead2="Sensor2:"+txtRead2
+            txtRead3=sensor3Read.joinToString(prefix="",separator = ",",postfix="")
+            txtRead3="Sensor3:"+txtRead3
             csvHelperSAF?.let{
-                it.writeSensorDataToCsv(txtRead)
+                it.writeSensorDataToCsv(txtRead2)
+                it.writeSensorDataToCsv(txtRead3)
             }
 
             val dateAndtime: LocalDateTime = LocalDateTime.now()
@@ -390,9 +419,11 @@ class BleRepository {
 //            } catch(e:NumberFormatException){
 //                return
 //            }
-            Log.d(TAG, "read: "+txtRead)
-            isTxtRead = true
+//            Log.d(TAG, "read: "+txtRead2)
+            isTxtRead2 = true
+            isTxtRead3 = true
             isSensor2Read = true
+            isSensor3Read = true
         }
     }
 
